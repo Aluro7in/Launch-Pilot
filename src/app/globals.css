@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fafafa;
+  --foreground: #111827;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b0f19;
+    --foreground: #f3f4f6;
+    --card: #111827;
+    --border: #1f2937;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Premium minimalist layout utility overrides */
+.glass-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Pulse shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, var(--border) 25%, var(--background) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ─── Assistant Panel ─── */
+
+@keyframes assistant-slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes assistant-slide-out {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes assistant-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes assistant-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.assistant-panel-enter {
+  animation: assistant-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.assistant-panel-exit {
+  animation: assistant-slide-out 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.assistant-backdrop-enter {
+  animation: assistant-fade-in 0.25s ease forwards;
+}
+
+.assistant-backdrop-exit {
+  animation: assistant-fade-out 0.2s ease forwards;
+}
+
+/* Floating trigger pulse */
+@keyframes trigger-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50%      { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+}
+
+.assistant-trigger-pulse {
+  animation: trigger-pulse 2.5s ease-in-out infinite;
+}
+
+/* Typing indicator */
+@keyframes typing-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-3px); }
+}
+
+.typing-dot:nth-child(1) { animation: typing-dot 1.2s infinite 0s; }
+.typing-dot:nth-child(2) { animation: typing-dot 1.2s infinite 0.15s; }
+.typing-dot:nth-child(3) { animation: typing-dot 1.2s infinite 0.3s; }
+
+/* Recording pulse */
+@keyframes recording-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(1.15); }
+}
+
+.recording-pulse {
+  animation: recording-pulse 1s ease-in-out infinite;
+}
+
+/* Assistant message markdown */
+.assistant-msg p { margin-bottom: 0.5rem; }
+.assistant-msg ul, .assistant-msg ol { margin: 0.35rem 0; padding-left: 1.25rem; }
+.assistant-msg li { margin-bottom: 0.2rem; }
+.assistant-msg strong { font-weight: 600; }
+.assistant-msg code { background: var(--border); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.8em; }
+
+/* Scrollbar inside assistant */
+.assistant-scroll::-webkit-scrollbar { width: 4px; }
+.assistant-scroll::-webkit-scrollbar-track { background: transparent; }
+.assistant-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.assistant-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
