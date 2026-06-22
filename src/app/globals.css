@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* ─── Tailwind v4: class-based dark mode (for next-themes) ─── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Design Tokens ─── */
 :root {
   --background: #fafafa;
   --foreground: #111827;
@@ -7,17 +11,30 @@
   --border: #e5e7eb;
   --accent: #4f46e5;
   --accent-hover: #4338ca;
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  --hero-gradient-1: rgba(99, 102, 241, 0.08);
+  --hero-gradient-2: rgba(168, 85, 247, 0.06);
+  --particle-color: rgba(99, 102, 241, 0.15);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b0f19;
-    --foreground: #f3f4f6;
-    --card: #111827;
-    --border: #1f2937;
-    --accent: #6366f1;
-    --accent-hover: #4f46e5;
-  }
+.dark {
+  --background: #0b0f19;
+  --foreground: #f3f4f6;
+  --card: #111827;
+  --border: #1f2937;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.3);
+  --hero-gradient-1: rgba(99, 102, 241, 0.12);
+  --hero-gradient-2: rgba(168, 85, 247, 0.1);
+  --particle-color: rgba(129, 140, 248, 0.2);
+}
+
+/* ─── Smooth Theme Transition ─── */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease, box-shadow 0.3s ease;
 }
 
 body {
@@ -26,26 +43,27 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-/* Premium minimalist layout utility overrides */
+/* ─── Glass Card ─── */
 .glass-card {
   background-color: var(--card);
   border: 1px solid var(--border);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -3px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
 }
 
-/* Pulse shimmer effect */
+.dark .glass-card:hover {
+  box-shadow: 0 8px 25px -5px rgba(99, 102, 241, 0.08), 0 4px 10px -3px rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Shimmer Effect ─── */
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .shimmer {
@@ -54,8 +72,223 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* ─── Assistant Panel ─── */
+/* ─── Floating Particles ─── */
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  25% { transform: translateY(-80px) translateX(20px); }
+  50% { transform: translateY(-160px) translateX(-15px); }
+  75% { transform: translateY(-240px) translateX(25px); }
+  100% { transform: translateY(-320px) translateX(0px); opacity: 0; }
+}
 
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--particle-color);
+  animation: float-particle linear infinite;
+  pointer-events: none;
+}
+
+/* Particle positions (replaces inline styles) */
+.particle-0  { left: 8%;    bottom: -5%;  width: 3px; height: 3px; animation-duration: 6s;  animation-delay: 0s; }
+.particle-1  { left: 15.5%; bottom: -8%;  width: 5px; height: 5px; animation-duration: 8s;  animation-delay: 0.8s; }
+.particle-2  { left: 23%;   bottom: -11%; width: 7px; height: 7px; animation-duration: 10s; animation-delay: 1.6s; }
+.particle-3  { left: 30.5%; bottom: -14%; width: 3px; height: 3px; animation-duration: 12s; animation-delay: 2.4s; }
+.particle-4  { left: 38%;   bottom: -17%; width: 5px; height: 5px; animation-duration: 14s; animation-delay: 3.2s; }
+.particle-5  { left: 45.5%; bottom: -20%; width: 7px; height: 7px; animation-duration: 6s;  animation-delay: 4s; }
+.particle-6  { left: 53%;   bottom: -23%; width: 3px; height: 3px; animation-duration: 8s;  animation-delay: 4.8s; }
+.particle-7  { left: 60.5%; bottom: -26%; width: 5px; height: 5px; animation-duration: 10s; animation-delay: 5.6s; }
+.particle-8  { left: 68%;   bottom: -29%; width: 7px; height: 7px; animation-duration: 12s; animation-delay: 6.4s; }
+.particle-9  { left: 75.5%; bottom: -32%; width: 3px; height: 3px; animation-duration: 14s; animation-delay: 7.2s; }
+.particle-10 { left: 83%;   bottom: -35%; width: 5px; height: 5px; animation-duration: 6s;  animation-delay: 8s; }
+.particle-11 { left: 8.5%;  bottom: -38%; width: 7px; height: 7px; animation-duration: 8s;  animation-delay: 8.8s; }
+
+/* ─── Aurora Glow Background ─── */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.05); }
+  50% { transform: translate(-20px, 15px) scale(0.95); }
+  75% { transform: translate(15px, 25px) scale(1.02); }
+}
+
+@keyframes aurora-drift-reverse {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-25px, 20px) scale(0.98); }
+  50% { transform: translate(30px, -15px) scale(1.04); }
+  75% { transform: translate(-10px, -25px) scale(1); }
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.aurora-blob-1 {
+  width: 400px;
+  height: 400px;
+  top: -10%;
+  left: 15%;
+  background: radial-gradient(circle, var(--hero-gradient-1), transparent 70%);
+  animation: aurora-drift 8s ease-in-out infinite;
+}
+
+.aurora-blob-2 {
+  width: 350px;
+  height: 350px;
+  top: 20%;
+  right: 10%;
+  background: radial-gradient(circle, var(--hero-gradient-2), transparent 70%);
+  animation: aurora-drift-reverse 10s ease-in-out infinite;
+}
+
+.aurora-blob-3 {
+  width: 300px;
+  height: 300px;
+  bottom: 10%;
+  left: 40%;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.06), transparent 70%);
+  animation: aurora-drift 12s ease-in-out infinite;
+}
+
+.dark .aurora-blob { opacity: 0.8; }
+
+/* ─── Text Gradient Shimmer (Hero Headline) ─── */
+@keyframes gradient-text-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-text-animated {
+  background: linear-gradient(
+    270deg,
+    #4f46e5,
+    #7c3aed,
+    #a855f7,
+    #6366f1,
+    #4f46e5
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-text-flow 4s ease infinite;
+}
+
+/* ─── CTA Glow Pulse ─── */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px var(--accent-glow), 0 0 40px transparent; }
+  50% { box-shadow: 0 0 25px var(--accent-glow), 0 0 60px var(--accent-glow); }
+}
+
+.cta-glow {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.cta-glow:hover {
+  animation: none;
+  box-shadow: 0 0 30px var(--accent-glow), 0 0 80px var(--accent-glow);
+}
+
+/* ─── Card Hover Tilt ─── */
+.card-tilt {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+}
+
+.card-tilt:hover {
+  transform: translateY(-4px) rotateX(2deg) rotateY(-1deg);
+}
+
+/* ─── Feature Icon Float ─── */
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.icon-float {
+  animation: icon-float 3s ease-in-out infinite;
+}
+
+.icon-float-delay-0 { animation-delay: 0s; }
+.icon-float-delay-1 { animation-delay: 0.5s; }
+.icon-float-delay-2 { animation-delay: 1s; }
+.icon-float-delay-3 { animation-delay: 1.5s; }
+
+/* ─── Gradient Border Effect ─── */
+.gradient-border {
+  position: relative;
+  background: var(--card);
+  border-radius: 12px;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.15));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+/* ─── Badge Shimmer ─── */
+@keyframes badge-shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.badge-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(99, 102, 241, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: badge-shimmer 3s ease-in-out infinite;
+}
+
+/* ─── Stagger Reveal (for grid children) ─── */
+@keyframes stagger-reveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.stagger-child {
+  opacity: 0;
+  animation: stagger-reveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-child:nth-child(1) { animation-delay: 0.1s; }
+.stagger-child:nth-child(2) { animation-delay: 0.2s; }
+.stagger-child:nth-child(3) { animation-delay: 0.3s; }
+.stagger-child:nth-child(4) { animation-delay: 0.4s; }
+.stagger-child:nth-child(5) { animation-delay: 0.5s; }
+.stagger-child:nth-child(6) { animation-delay: 0.6s; }
+
+/* ─── Stat Counter Pulse ─── */
+@keyframes count-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.stat-pulse:hover {
+  animation: count-pulse 0.6s ease;
+}
+
+/* ─── Assistant Panel ─── */
 @keyframes assistant-slide-in {
   from { transform: translateX(100%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
@@ -134,3 +367,6 @@ body {
 .assistant-scroll::-webkit-scrollbar-track { background: transparent; }
 .assistant-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 .assistant-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ─── Misc Utility ─── */
+.perspective-1000 { perspective: 1000px; }

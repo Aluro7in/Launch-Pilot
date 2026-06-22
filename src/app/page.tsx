@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AssistantPanel from '@/components/AssistantPanel';
 import { 
@@ -20,7 +20,11 @@ import {
   ArrowLeft,
   BookOpen,
   Send,
-  Loader2
+  Loader2,
+  Zap,
+  Layers,
+  Target,
+  Shield
 } from 'lucide-react';
 import { LaunchFormInputs, LaunchPack, RiskBlocker, SuccessMetric } from '@/lib/types';
 import { EXAMPLE_BRIEFS } from '@/lib/mock-data';
@@ -66,7 +70,7 @@ export default function Home() {
         setPack(JSON.parse(cachedPack));
         setInputs(JSON.parse(cachedInputs));
         setViewState('workspace');
-      } catch (e) {
+      } catch {
         // Clear corrupt cache
         sessionStorage.removeItem('launchpilot_pack');
         sessionStorage.removeItem('launchpilot_inputs');
@@ -316,7 +320,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
     sessionStorage.setItem('launchpilot_pack', JSON.stringify(updated));
   };
 
-  const updateChecklistItem = (subKey: keyof typeof pack.launch_checklist, idx: number, newVal: string) => {
+  const updateChecklistItem = (subKey: keyof LaunchPack['launch_checklist'], idx: number, newVal: string) => {
     if (!pack) return;
     const list = [...pack.launch_checklist[subKey]];
     list[idx] = newVal;
@@ -368,67 +372,120 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-4xl px-4 sm:px-6 py-16 sm:py-24 flex flex-col items-center text-center"
+          className="w-full max-w-4xl px-4 sm:px-6 py-16 sm:py-24 flex flex-col items-center text-center relative overflow-hidden"
         >
-          
+
+          {/* ── Aurora Glow Blobs ── */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+            <div className="aurora-blob aurora-blob-1" />
+            <div className="aurora-blob aurora-blob-2" />
+            <div className="aurora-blob aurora-blob-3" />
+          </div>
+
+          {/* ── Floating Particles ── */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div
+                key={`particle-${i}`}
+                className={`particle particle-${i}`}
+              />
+            ))}
+          </div>
+
+          {/* ── Badge ── */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.4 }}
-            className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/60 mb-6"
+            className="relative inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/60 mb-6 badge-shimmer"
           >
-            <Sparkles className="h-4.5 w-4.5 text-indigo-600 dark:text-indigo-400" />
+            <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
               The AI Co-pilot for Product Launches
             </span>
           </motion.div>
 
+          {/* ── Headline with Animated Gradient ── */}
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white max-w-3xl leading-tight"
+            className="relative text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white max-w-3xl leading-tight"
           >
-            Turn rough product ideas into <span className="bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">launch-ready</span> plans
+            Turn rough product ideas into{' '}
+            <span className="gradient-text-animated">launch-ready</span>{' '}
+            plans
           </motion.h1>
 
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-6 text-lg sm:text-xl text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed"
+            className="mt-6 text-lg sm:text-xl text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed relative"
           >
             LaunchPilot helps solo founders and product teams turn messy ideas, PRDs, and feature briefs into practical launch packs in minutes.
           </motion.p>
 
+          {/* ── CTA Buttons ── */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full justify-center"
+            className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full justify-center relative"
           >
             <button
               onClick={() => setViewState('workspace')}
-              className="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium text-sm rounded-lg transition-all shadow-sm hover:shadow-md cursor-pointer relative overflow-hidden group"
+              className="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium text-sm rounded-lg transition-all shadow-sm hover:shadow-md cursor-pointer relative overflow-hidden group cta-glow"
             >
               <span className="relative z-10">Generate your launch pack</span>
               <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             </button>
             <a
               href="#examples"
-              className="w-full sm:w-auto px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-sm rounded-lg transition-all cursor-pointer"
+              className="w-full sm:w-auto px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-sm rounded-lg transition-all cursor-pointer hover:shadow-md"
             >
               Browse examples
             </a>
           </motion.div>
 
-          {/* Quick-Start Example Cards */}
+          {/* ── Feature Highlights Strip ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55, duration: 0.6 }}
+            className="mt-16 w-full relative"
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: Zap, label: 'Instant Packs', desc: 'Generate in seconds' },
+                { icon: Layers, label: 'Full Coverage', desc: 'Checklists, risks, metrics' },
+                { icon: Target, label: 'Goal-Driven', desc: 'Aligned to your KPIs' },
+                { icon: Shield, label: 'Risk Analysis', desc: 'Blockers identified' },
+              ].map((feat, i) => (
+                <motion.div
+                  key={feat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 + i * 0.1, duration: 0.4 }}
+                  className="flex flex-col items-center p-4 rounded-xl bg-white/60 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/60 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-900/60 transition-all group"
+                >
+                  <div className={`h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center mb-3 icon-float icon-float-delay-${i} group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors`}>
+                    <feat.icon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <span className="text-xs font-bold text-gray-900 dark:text-white">{feat.label}</span>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">{feat.desc}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* ── Quick-Start Example Cards ── */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
             id="examples" 
-            className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-800 w-full text-left"
+            className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-800 w-full text-left relative"
           >
             <div className="flex items-center space-x-2.5 mb-8">
               <BookOpen className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -437,12 +494,15 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
               </h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {EXAMPLE_BRIEFS.map((brief) => (
-                <div 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 perspective-1000">
+              {EXAMPLE_BRIEFS.map((brief, idx) => (
+                <motion.div 
                   key={brief.id}
+                  initial={{ opacity: 0, y: 25, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.9 + idx * 0.12, duration: 0.45, ease: 'easeOut' }}
                   onClick={() => handleUseExample(brief.id)}
-                  className="glass-card p-6 rounded-xl cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 relative group flex flex-col h-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
+                  className="glass-card gradient-border card-tilt p-6 rounded-xl cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 relative group flex flex-col h-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
                 >
                   <div className="flex-1">
                     <span className="text-[10px] font-semibold tracking-wide uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100/50 dark:border-indigo-900/40 px-2 py-0.5 rounded">
@@ -458,7 +518,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                   <div className="mt-6 flex items-center text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform">
                     Use this brief <ChevronRight className="h-3.5 w-3.5 ml-1" />
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
@@ -810,6 +870,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                         value={pack.launch_summary}
                         onChange={(e) => updateSummary(e.target.value)}
                         className="w-full p-2.5 text-xs bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white resize-none"
+                        title="Edit Launch Summary"
                       />
                     ) : (
                       <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed font-normal">
@@ -832,6 +893,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                           <button
                             onClick={() => setEditingSection(editingSection === 'stories' ? null : 'stories')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            title="Edit user stories"
                           >
                             <PenLine className="h-3.5 w-3.5" />
                           </button>
@@ -839,6 +901,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                             onClick={() => handleRegenerateSection('user_stories')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             disabled={regeneratingSection === 'user_stories'}
+                            title="Regenerate user stories"
                           >
                             <RotateCw className={`h-3.5 w-3.5 ${regeneratingSection === 'user_stories' ? 'animate-spin' : ''}`} />
                           </button>
@@ -860,6 +923,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                 value={story}
                                 onChange={(e) => updateArrayItem('user_stories', idx, e.target.value)}
                                 className="w-full p-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white"
+                                title="Edit user story"
                               />
                             ) : (
                               <div className="flex items-start space-x-2">
@@ -883,6 +947,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                           <button
                             onClick={() => setEditingSection(editingSection === 'demo' ? null : 'demo')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            title="Edit demo flow script"
                           >
                             <PenLine className="h-3.5 w-3.5" />
                           </button>
@@ -890,6 +955,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                             onClick={() => handleRegenerateSection('demo_script')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             disabled={regeneratingSection === 'demo_script'}
+                            title="Regenerate demo flow script"
                           >
                             <RotateCw className={`h-3.5 w-3.5 ${regeneratingSection === 'demo_script' ? 'animate-spin' : ''}`} />
                           </button>
@@ -911,6 +977,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                 value={step}
                                 onChange={(e) => updateArrayItem('demo_script', idx, e.target.value)}
                                 className="w-full p-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white"
+                                title="Edit demo step"
                               />
                             ) : (
                               <div className="flex items-start space-x-2">
@@ -938,6 +1005,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                         <button
                           onClick={() => setEditingSection(editingSection === 'checklist' ? null : 'checklist')}
                           className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                          title="Edit launch checklist"
                         >
                           <PenLine className="h-3.5 w-3.5" />
                         </button>
@@ -945,6 +1013,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                           onClick={() => handleRegenerateSection('launch_checklist')}
                           className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                           disabled={regeneratingSection === 'launch_checklist'}
+                          title="Regenerate launch checklist"
                         >
                           <RotateCw className={`h-3.5 w-3.5 ${regeneratingSection === 'launch_checklist' ? 'animate-spin' : ''}`} />
                         </button>
@@ -973,6 +1042,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                   value={item}
                                   onChange={(e) => updateChecklistItem('before_launch', idx, e.target.value)}
                                   className="w-full p-1.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white"
+                                  title="Edit prep checklist item"
                                 />
                               ) : (
                                 <label className="flex items-start space-x-2 text-gray-600 dark:text-gray-300 leading-normal cursor-pointer select-none">
@@ -999,6 +1069,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                   value={item}
                                   onChange={(e) => updateChecklistItem('launch_day', idx, e.target.value)}
                                   className="w-full p-1.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white"
+                                  title="Edit launch day checklist item"
                                 />
                               ) : (
                                 <label className="flex items-start space-x-2 text-gray-600 dark:text-gray-300 leading-normal cursor-pointer select-none">
@@ -1025,6 +1096,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                   value={item}
                                   onChange={(e) => updateChecklistItem('after_launch', idx, e.target.value)}
                                   className="w-full p-1.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white"
+                                  title="Edit post-launch checklist item"
                                 />
                               ) : (
                                 <label className="flex items-start space-x-2 text-gray-600 dark:text-gray-300 leading-normal cursor-pointer select-none">
@@ -1051,6 +1123,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                         <button
                           onClick={() => setEditingSection(editingSection === 'risks' ? null : 'risks')}
                           className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                          title="Edit risks"
                         >
                           <PenLine className="h-3.5 w-3.5" />
                         </button>
@@ -1058,6 +1131,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                           onClick={() => handleRegenerateSection('risks_and_blockers')}
                           className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                           disabled={regeneratingSection === 'risks_and_blockers'}
+                          title="Regenerate risks"
                         >
                           <RotateCw className={`h-3.5 w-3.5 ${regeneratingSection === 'risks_and_blockers' ? 'animate-spin' : ''}`} />
                         </button>
@@ -1089,6 +1163,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                     value={risk.risk}
                                     onChange={(e) => updateRiskItem(idx, 'risk', e.target.value)}
                                     className="w-full p-1 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none dark:text-white"
+                                    title="Edit risk name"
                                   />
                                 ) : (
                                   <span className="font-semibold text-gray-900 dark:text-white leading-normal">{risk.risk}</span>
@@ -1101,6 +1176,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                     value={risk.impact}
                                     onChange={(e) => updateRiskItem(idx, 'impact', e.target.value)}
                                     className="w-full p-1 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none dark:text-white"
+                                    title="Edit risk impact"
                                   />
                                 ) : (
                                   <span className="inline-flex px-2 py-0.5 rounded-full text-[9px] font-medium tracking-wide uppercase bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/60 leading-normal">
@@ -1115,6 +1191,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                     value={risk.mitigation}
                                     onChange={(e) => updateRiskItem(idx, 'mitigation', e.target.value)}
                                     className="w-full p-1 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none dark:text-white resize-none"
+                                    title="Edit risk mitigation"
                                   />
                                 ) : (
                                   <span className="leading-relaxed block">{risk.mitigation}</span>
@@ -1141,6 +1218,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                           <button
                             onClick={() => setEditingSection(editingSection === 'release' ? null : 'release')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            title="Edit release notes"
                           >
                             <PenLine className="h-3.5 w-3.5" />
                           </button>
@@ -1148,6 +1226,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                             onClick={() => handleRegenerateSection('release_notes')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             disabled={regeneratingSection === 'release_notes'}
+                            title="Regenerate release notes"
                           >
                             <RotateCw className={`h-3.5 w-3.5 ${regeneratingSection === 'release_notes' ? 'animate-spin' : ''}`} />
                           </button>
@@ -1169,6 +1248,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                 value={note}
                                 onChange={(e) => updateArrayItem('release_notes', idx, e.target.value)}
                                 className="w-full p-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white"
+                                title="Edit release note item"
                               />
                             ) : (
                               <div className="flex items-start space-x-2">
@@ -1202,6 +1282,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                           <button
                             onClick={() => setEditingSection(editingSection === 'feedback' ? null : 'feedback')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            title="Edit feedback questions"
                           >
                             <PenLine className="h-3.5 w-3.5" />
                           </button>
@@ -1209,6 +1290,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                             onClick={() => handleRegenerateSection('feedback_questions')}
                             className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                             disabled={regeneratingSection === 'feedback_questions'}
+                            title="Regenerate feedback questions"
                           >
                             <RotateCw className={`h-3.5 w-3.5 ${regeneratingSection === 'feedback_questions' ? 'animate-spin' : ''}`} />
                           </button>
@@ -1230,6 +1312,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                 value={q}
                                 onChange={(e) => updateArrayItem('feedback_questions', idx, e.target.value)}
                                 className="w-full p-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:text-white"
+                                title="Edit feedback question"
                               />
                             ) : (
                               <div className="flex items-start space-x-2">
@@ -1255,6 +1338,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                         <button
                           onClick={() => setEditingSection(editingSection === 'metrics' ? null : 'metrics')}
                           className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                          title="Edit success metrics"
                         >
                           <PenLine className="h-3.5 w-3.5" />
                         </button>
@@ -1262,6 +1346,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                           onClick={() => handleRegenerateSection('success_metrics')}
                           className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                           disabled={regeneratingSection === 'success_metrics'}
+                          title="Regenerate success metrics"
                         >
                           <RotateCw className={`h-3.5 w-3.5 ${regeneratingSection === 'success_metrics' ? 'animate-spin' : ''}`} />
                         </button>
@@ -1293,6 +1378,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                     value={metric.metric}
                                     onChange={(e) => updateMetricItem(idx, 'metric', e.target.value)}
                                     className="w-full p-1 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none dark:text-white font-semibold"
+                                    title="Edit metric name"
                                   />
                                 ) : (
                                   <span className="font-semibold text-gray-900 dark:text-white leading-normal">{metric.metric}</span>
@@ -1305,6 +1391,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                     value={metric.target}
                                     onChange={(e) => updateMetricItem(idx, 'target', e.target.value)}
                                     className="w-full p-1 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none dark:text-white"
+                                    title="Edit metric target"
                                   />
                                 ) : (
                                   <span className="text-gray-900 dark:text-white font-normal leading-normal">{metric.target}</span>
@@ -1317,6 +1404,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
                                     value={metric.why_it_matters}
                                     onChange={(e) => updateMetricItem(idx, 'why_it_matters', e.target.value)}
                                     className="w-full p-1 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded focus:outline-none dark:text-white resize-none"
+                                    title="Edit metric importance reason"
                                   />
                                 ) : (
                                   <span className="leading-relaxed block">{metric.why_it_matters}</span>
@@ -1339,7 +1427,7 @@ ${pack.feedback_questions.map(q => `* ${q}`).join('\n')}
           <AssistantPanel 
             inputs={inputs} 
             pack={pack} 
-            onInsertBrief={(text) => {
+            onInsertBriefAction={(text) => {
               setInputs((prev) => ({
                 ...prev,
                 description: prev.description

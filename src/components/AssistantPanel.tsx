@@ -34,10 +34,39 @@ interface UploadedFile {
   extractedText: string;
 }
 
+interface SpeechRecognitionResult {
+  [index: number]: {
+    transcript: string;
+  };
+}
+
+interface SpeechRecognitionEvent {
+  results: {
+    length: number;
+    [index: number]: SpeechRecognitionResult;
+  };
+}
+
+interface SpeechRecognitionInstance {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onend: () => void;
+  onerror: () => void;
+  start: () => void;
+  stop: () => void;
+}
+
+interface SpeechWindow extends Window {
+  SpeechRecognition?: new () => SpeechRecognitionInstance;
+  webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
+}
+
 interface AssistantPanelProps {
   inputs: LaunchFormInputs;
   pack: LaunchPack | null;
-  onInsertBrief: (text: string) => void;
+  onInsertBriefAction: (text: string) => void;
 }
 
 // ─── Quick Actions ───
@@ -172,7 +201,7 @@ function renderMarkdown(text: string): React.ReactNode {
 
 // ─── Main Component ───
 
-export default function AssistantPanel({ inputs, pack, onInsertBrief }: AssistantPanelProps) {
+export default function AssistantPanel({ inputs, pack, onInsertBriefAction }: AssistantPanelProps) {
   // Panel state
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -189,7 +218,7 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
   // Speech
   const [isRecording, setIsRecording] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   // Scroll management
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -197,7 +226,7 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
 
   // Check speech support on mount
   useEffect(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as unknown as SpeechWindow).SpeechRecognition || (window as unknown as SpeechWindow).webkitSpeechRecognition;
     setSpeechSupported(!!SpeechRecognition);
   }, []);
 
@@ -280,7 +309,7 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
         name: 'assistant_response_received',
         properties: { durationMs: Date.now() - startTime, success: true },
       });
-    } catch (err) {
+    } catch {
       const errorMessage: Message = {
         id: `msg-${Date.now()}`,
         role: 'assistant',
@@ -387,7 +416,7 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
       return;
     }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as unknown as SpeechWindow).SpeechRecognition || (window as unknown as SpeechWindow).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
@@ -395,9 +424,9 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
+        .map((result) => (result as SpeechRecognitionResult)[0].transcript)
         .join('');
       setInputValue(transcript);
     };
@@ -420,7 +449,7 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
   // ─── Insert to Brief ───
 
   const handleInsertToBrief = (text: string) => {
-    onInsertBrief(text);
+    onInsertBriefAction(text);
     trackEvent({
       name: 'assistant_inserted_into_brief',
       properties: { textLength: text.length },
@@ -607,6 +636,7 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
                   <button
                     onClick={() => setUploadedFile(null)}
                     className="text-emerald-400 hover:text-red-500 transition-colors cursor-pointer"
+                    title="Remove file"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -632,6 +662,7 @@ export default function AssistantPanel({ inputs, pack, onInsertBrief }: Assistan
                   accept=".txt,.md,.pdf,.json,.csv,.doc,.docx"
                   className="hidden"
                   onChange={handleFileUpload}
+                  title="Upload document"
                 />
 
                 {/* Text Input */}

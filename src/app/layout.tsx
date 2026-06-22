@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} font-sans h-full antialiased`} suppressHydrationWarning>
-      <body className="min-h-screen bg-[#fafafa] dark:bg-[#0b0f19] text-gray-900 dark:text-gray-100 flex flex-col">
+      <body className="min-h-screen bg-[#fafafa] dark:bg-[#0b0f19] text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         {/* Navigation Header */}
         <header className="sticky top-0 z-40 w-full border-b border-gray-200 dark:border-gray-800 bg-[#fafafa]/80 dark:bg-[#0b0f19]/80 backdrop-blur-md">
@@ -42,7 +42,7 @@ export default function RootLayout({
               <a 
                 href="https://github.com" 
                 target="_blank" 
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="text-xs text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors"
               >
                 GitHub
