@@ -35,6 +35,7 @@ Product development templates (like standard PRDs) are often dry, empty shells, 
 
 ---
 
+
 ## 🎨 Design Decisions
 
 To make the app feel like a credible, premium SaaS tool rather than an "AI template wrapper," we implemented:
